@@ -1,0 +1,5 @@
+[
+  { "id": "1","name": "Lounge", "muted": false, "volume": 35 },
+  { "id": "2","name": "Kitchen", "muted": false, "volume": 24 },
+  { "id": "3","name": "Patio", "muted": true, "volume": 24 }
+]
