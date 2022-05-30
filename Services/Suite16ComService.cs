@@ -1,7 +1,8 @@
 using System.IO.Ports;
 
 public interface ISuite16ComService {
-    void ToggleMute(int roomId);
+    void ToggleMute(int index);
+    void SetVolume(int index, int value);
 }
 
 public class Suite16ComService : ISuite16ComService, IDisposable {
@@ -39,6 +40,10 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
 
     public void ToggleMute(int room) {
         Send($"`SMTOGR{room:00}");
+    }
+
+    public void SetVolume(int room, int vol) {
+        Send($"`SV{vol:000}R{room:00}");
     }
 
     private void Read(object sender, SerialDataReceivedEventArgs e) {

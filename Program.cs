@@ -20,6 +20,8 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",

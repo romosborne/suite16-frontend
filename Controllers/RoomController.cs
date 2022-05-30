@@ -27,12 +27,20 @@ public class RoomController : ControllerBase {
     [Route("{id}")]
     public Room Get(int id) {
         var state = stateService.GetState();
-        return state.Rooms[id];
+        return state.Rooms.Single(r => r.Id == id);
     }
 
     [HttpPost]
     [Route("{id}/toggleMute")]
-    public void Post(int id) {
+    public ActionResult ToggleMute(int id) {
         comService.ToggleMute(id);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/vol/{value}")]
+    public ActionResult SetVol(int id, int value) {
+        comService.SetVolume(id, value);
+        return Ok();
     }
 }

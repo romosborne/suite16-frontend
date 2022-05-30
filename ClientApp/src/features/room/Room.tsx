@@ -2,31 +2,47 @@ import { useState } from "react";
 import { ActionIcon, Paper, Slider, Title } from "@mantine/core";
 import { Col, Row } from "react-bootstrap";
 import { Volume, Volume3 } from "tabler-icons-react";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { selectRoomById, setVolume, toggleMute } from "./roomSlice";
+import { BaseUrl, RoomDbo } from "./models";
 
-export const Room = ({ id }: { id: string }) => {
-  const r = useAppSelector((state) => selectRoomById(state, id));
-  if (r === undefined) throw new RangeError(`Unknown room id: ${id}`);
+export const Room = ({ r }: { r: RoomDbo }) => {
+  const [vol, setVol] = useState(r.volume);
+  const [mute, setMute] = useState(r.mute);
 
-  const dispatch = useAppDispatch();
-  const handleToggleMute = () => {
-    console.log("Clicked");
-    dispatch(toggleMute(id));
+  const handleToggleMute = async () => {
+    await fetch(`${BaseUrl}/room/${r.id}/toggleMute`, {
+      method: "POST",
+    }).then((response) => {
+      if (response.ok) {
+        setMute(!mute);
+      } else {
+        console.log(response.statusText);
+        console.log(response.body);
+      }
+    });
   };
-  const handleSetVolume = (value: number) =>
-    dispatch(setVolume({ id: id, value: value }));
+
+  const handleSetVolume = async (value: number) => {
+    const response = await fetch(`${BaseUrl}/room/${r.id}/vol/${value}`, {
+      method: "POST",
+    });
+    if (response.ok) {
+      setVol(value);
+    } else {
+      console.log(response.statusText);
+      console.log(response.body);
+    }
+  };
 
   return (
     <Paper shadow="md" p="md" withBorder style={{ marginTop: 10 }}>
       <Row style={{ display: "flex", alignItems: "center" }}>
         <Col xs={1} style={{ padding: "10px", marginRight: "10px" }}>
-          <ActionIcon radius="sm" size="xl" onClick={handleToggleMute}>
-            {r.muted ? (
-              <Volume3 size={48} />
-            ) : (
-              <Volume size={48} color="orange" />
-            )}
+          <ActionIcon
+            radius="sm"
+            size="xl"
+            onClick={(_: any) => handleToggleMute()}
+          >
+            {mute ? <Volume3 size={48} /> : <Volume size={48} color="orange" />}
           </ActionIcon>
         </Col>
         <Col>
@@ -40,8 +56,8 @@ export const Room = ({ id }: { id: string }) => {
             max={40}
             label={null}
             color="orange"
-            value={r.volume}
-            // onChange={setVol}
+            value={vol}
+            onChange={setVol}
             onChangeEnd={handleSetVolume}
           />
         </Col>
