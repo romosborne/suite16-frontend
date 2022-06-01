@@ -1,5 +1,3 @@
-using System.IO.Ports;
-
 public interface IStateService {
     void ParseCommand(string command);
     int? IdToIndex(int id);
@@ -46,7 +44,18 @@ public class StateService : IStateService {
             case "V0":
                 _state.AdjustRoom(room, (r) => r.Volume = int.Parse(f2));
                 break;
-
+            case "B-":
+            case "B0":
+            case "B+":
+                var bass = int.Parse(command.Substring(4, 3));
+                _state.AdjustRoom(room, (r) => r.Bass = bass);
+                break;
+            case "T-":
+            case "T0":
+            case "T+":
+                var treble = int.Parse(command.Substring(4, 3));
+                _state.AdjustRoom(room, (r) => r.Treble = treble);
+                break;
         }
     }
 }

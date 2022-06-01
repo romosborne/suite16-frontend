@@ -10,9 +10,9 @@ public class Room {
     public int Treble { get; set; }
     public int Balance { get; set; }
 
-    public Room(int id) {
+    public Room(int id, string name) {
         this.Id = id;
-        this.Name = $"Room {id}";
+        this.Name = name;
     }
 
     public void VolumeUp() => Volume = Math.Min(Volume + 1, MaxVol);

@@ -1,8 +1,16 @@
 using System.IO.Ports;
 
+public class Response {
+    public bool Ok { get; set; }
+    public string? Error { get; set; }
+}
+
 public interface ISuite16ComService {
-    void ToggleMute(int index);
-    void SetVolume(int index, int value);
+    Response ToggleMute(int id);
+    Response SetVolume(int id, int value);
+    Response SetTreble(int id, int value);
+    Response SetBass(int id, int value);
+    Response SetInput(int id, int value);
 }
 
 public class Suite16ComService : ISuite16ComService, IDisposable {
@@ -11,6 +19,8 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     private readonly List<string> _buffer;
     private readonly SerialPort _sp;
     private readonly IStateService _state;
+
+    private readonly Response Ok = new() { Ok = true };
 
     public Suite16ComService(string comPort, IStateService state) {
         _state = state;
@@ -34,16 +44,35 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     private void Send(string a) {
         _sp.Write($"{a}\r");
     }
-    private void CompleteRefresh() {
+
+    private Response CompleteRefresh() {
         Send("`GALRMG00\r\n");
+        return Ok;
     }
 
-    public void ToggleMute(int room) {
+    public Response ToggleMute(int room) {
         Send($"`SMTOGR{room:00}");
+        return Ok;
     }
 
-    public void SetVolume(int room, int vol) {
+    public Response SetVolume(int room, int vol) {
         Send($"`SV{vol:000}R{room:00}");
+        return Ok;
+    }
+
+    public Response SetTreble(int id, int value) {
+        Send($"`ST{value:+00;-00;000}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetBass(int id, int value) {
+        Send($"`SB{value:+00;-00;000}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetInput(int id, int value) {
+        Send($"`SAD{value:00}R{id:00}");
+        return Ok;
     }
 
     private void Read(object sender, SerialDataReceivedEventArgs e) {

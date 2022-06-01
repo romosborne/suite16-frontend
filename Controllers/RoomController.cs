@@ -43,4 +43,25 @@ public class RoomController : ControllerBase {
         comService.SetVolume(id, value);
         return Ok();
     }
+
+    [HttpPost]
+    [Route("{id}/treble/{value}")]
+    public ActionResult SetTreble(int id, int value) {
+        comService.SetTreble(id, value);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/bass/{value}")]
+    public ActionResult SetBass(int id, int value) {
+        comService.SetBass(id, value);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/input/{value}")]
+    public ActionResult SetInput(int id, int value) {
+        comService.SetInput(id, value);
+        return Ok();
+    }
 }
