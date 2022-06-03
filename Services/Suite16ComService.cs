@@ -10,6 +10,9 @@ public interface ISuite16ComService {
     Response SetVolume(int id, int value);
     Response SetTreble(int id, int value);
     Response SetBass(int id, int value);
+    Response SetLoudnessContour(int id, bool value);
+    Response SetStereoEnhance(int id, bool value);
+    Response SetPhonic(int id, Phonic value);
     Response SetInput(int id, int value);
 }
 
@@ -69,6 +72,32 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
         Send($"`SB{value:+00;-00;000}R{id:00}");
         return Ok;
     }
+
+    public Response SetLoudnessContour(int id, bool value) {
+        Send($"`SLD{(value ? "ON" : "OF")}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetStereoEnhance(int id, bool value) {
+        Send($"`SSE{(value ? "ON" : "OF")}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetPhonic(int id, Phonic value) {
+        switch (value) {
+            case Phonic.Stereo:
+                Send($"`SSTROR{id:00}");
+                break;
+            case Phonic.MonoLeft:
+                Send($"`SMINLR{id:00}");
+                break;
+            case Phonic.MonoRight:
+                Send($"`SMINRR{id:00}");
+                break;
+        }
+        return Ok;
+    }
+
 
     public Response SetInput(int id, int value) {
         Send($"`SAD{value:00}R{id:00}");

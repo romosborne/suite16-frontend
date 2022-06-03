@@ -29,6 +29,10 @@ public class StateService : IStateService {
         _ = int.TryParse(command.AsSpan(8, 2), out var room);
         System.Console.WriteLine($"f1: {f1}, f2:{f2}");
         switch (f1) {
+            // Input
+            case "AD":
+                _state.AdjustRoom(room, (r) => r.InputId = int.Parse(f2));
+                break;
             // Mute
             case "MT":
                 switch (f2) {
@@ -55,6 +59,39 @@ public class StateService : IStateService {
             case "T+":
                 var treble = int.Parse(command.Substring(4, 3));
                 _state.AdjustRoom(room, (r) => r.Treble = treble);
+                break;
+            case "LD":
+                switch (f2) {
+                    case "ON":
+                        _state.AdjustRoom(room, (r) => r.LoudnessContour = true);
+                        break;
+                    case "OF":
+                        _state.AdjustRoom(room, (r) => r.LoudnessContour = false);
+                        break;
+                }
+                break;
+            case "SE":
+                switch (f2) {
+                    case "ON":
+                        _state.AdjustRoom(room, (r) => r.StereoEnhance = true);
+                        break;
+                    case "OF":
+                        _state.AdjustRoom(room, (r) => r.StereoEnhance = false);
+                        break;
+                }
+                break;
+            case "ST":
+                _state.AdjustRoom(room, (r) => r.Phonic = Phonic.Stereo);
+                break;
+            case "MI":
+                switch (f2) {
+                    case "NL":
+                        _state.AdjustRoom(room, (r) => r.Phonic = Phonic.MonoLeft);
+                        break;
+                    case "NR":
+                        _state.AdjustRoom(room, (r) => r.Phonic = Phonic.MonoRight);
+                        break;
+                }
                 break;
         }
     }

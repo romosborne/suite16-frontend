@@ -4,24 +4,22 @@ import {
   NativeSelect,
   Paper,
   Slider,
+  Switch,
   Text,
   Title,
 } from "@mantine/core";
 import { Col, Modal, Row } from "react-bootstrap";
 import { Settings, Volume, Volume3 } from "tabler-icons-react";
-import { BaseUrl, InputDbo, RoomDbo } from "./models";
+import { BaseUrl, InputDbo, Phonic, RoomDbo } from "./models";
 
 export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
   const [showModal, setModal] = useState(false);
-
   const [room, setRoom] = useState(r);
 
+  // State for sliders
   const [vol, setVol] = useState(r.volume);
-  const [mute, setMute] = useState(r.mute);
-
   const [bass, setBass] = useState(r.bass);
   const [treble, setTreble] = useState(r.treble);
-  const [bal, setBal] = useState(r.balance);
 
   const handle = async (url: string, f: (r: RoomDbo) => RoomDbo) => {
     const response = await fetch(`${BaseUrl}/room/${r.id}/${url}`, {
@@ -51,16 +49,24 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
     await handle(`treble/${value}`, (r) => {
       return { ...r, treble: value };
     });
-  const handleSetBal = async (value: number) =>
-    await handle(`bal/${value}`, (r) => {
-      return { ...r, bal: value };
+  const handleSetLoud = async (value: boolean) =>
+    await handle(`loudnessContour/${value ? "1" : "0"}`, (r) => {
+      return { ...r, loudnessContour: value };
+    });
+  const handleSetStereoEnhance = async (value: boolean) =>
+    await handle(`stereoEnhance/${value ? "1" : "0"}`, (r) => {
+      return { ...r, stereoEnhance: value };
     });
 
-  const handleSetInput = async (name: string) => {
-    const input = inputs.find((i) => i.name === name);
-    if (!input) return;
-    await handle(`input/${input?.id}`, (r) => {
-      return { ...r, inputId: input?.id };
+  const handleSetInput = async (id: string) => {
+    await handle(`input/${id}`, (r) => {
+      return { ...r, inputId: id };
+    });
+  };
+
+  const handleSetPhonic = async (phonic: Phonic) => {
+    await handle(`phonic/${phonic}`, (r) => {
+      return { ...r, phonic: phonic };
     });
   };
 
@@ -77,8 +83,10 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
             </Col>
             <Col>
               <NativeSelect
-                data={inputs.map((i) => i.name)}
-                value={inputs.find((i) => i.id === r.inputId)?.name}
+                data={inputs.map((i) => {
+                  return { value: i.id, label: i.name };
+                })}
+                value={room.inputId}
                 onChange={(e) => handleSetInput(e.currentTarget.value)}
               />
             </Col>
@@ -127,6 +135,44 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               />
             </Col>
           </Row>
+          <Row style={{ marginBottom: 20 }}>
+            <Col>
+              <Switch
+                label="Loudness Contour"
+                checked={room.loudnessContour}
+                onChange={(e) => handleSetLoud(e.currentTarget.checked)}
+              />
+            </Col>
+            <Col>
+              <Switch
+                label="Stereo Enhance"
+                checked={room.stereoEnhance}
+                onChange={(e) =>
+                  handleSetStereoEnhance(e.currentTarget.checked)
+                }
+              />
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: 20 }}>
+            <Col xs={3}>
+              <Text weight={500}>Phonic: </Text>
+            </Col>
+            <Col>
+              <NativeSelect
+                data={[
+                  { value: Phonic[Phonic.Stereo], label: "Stereo" },
+                  { value: Phonic[Phonic.MonoLeft], label: "Mono Left" },
+                  { value: Phonic[Phonic.MonoRight], label: "Mono Right" },
+                ]}
+                value={Phonic[room.phonic]}
+                onChange={(e) =>
+                  handleSetPhonic(
+                    Phonic[e.currentTarget.value as keyof typeof Phonic]
+                  )
+                }
+              />
+            </Col>
+          </Row>
         </Modal.Body>
       </Modal>
 
@@ -138,7 +184,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               size="xl"
               onClick={(_: any) => handleToggleMute()}
             >
-              {mute ? (
+              {room.mute ? (
                 <Volume3 size={48} />
               ) : (
                 <Volume size={48} color="orange" />

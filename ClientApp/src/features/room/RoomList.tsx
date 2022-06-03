@@ -26,7 +26,7 @@ export const RoomList = () => {
     <>
       <Container fluid className="w-75">
         {rooms.map((r) => (
-          <Room r={r} inputs={inputs} />
+          <Room key={r.id} r={r} inputs={inputs} />
         ))}
       </Container>
     </>

@@ -59,6 +59,27 @@ public class RoomController : ControllerBase {
     }
 
     [HttpPost]
+    [Route("{id}/loudnessContour/{value}")]
+    public ActionResult SetLoudnessContour(int id, int value) {
+        comService.SetLoudnessContour(id, value == 1);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/stereoEnhance/{value}")]
+    public ActionResult SetStereoEnhance(int id, int value) {
+        comService.SetStereoEnhance(id, value == 1);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/phonic/{value}")]
+    public ActionResult SetPhonic(int id, Phonic value) {
+        comService.SetPhonic(id, value);
+        return Ok();
+    }
+
+    [HttpPost]
     [Route("{id}/input/{value}")]
     public ActionResult SetInput(int id, int value) {
         comService.SetInput(id, value);
