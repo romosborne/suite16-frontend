@@ -11,7 +11,7 @@
     "suite_16_api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7028;http://localhost:5066",
+      "applicationUrl": "http://localhost:5077",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
