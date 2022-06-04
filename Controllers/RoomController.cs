@@ -85,4 +85,19 @@ public class RoomController : ControllerBase {
         comService.SetInput(id, value);
         return Ok();
     }
+
+    [HttpPost]
+    [Route("{id}/on")]
+    public ActionResult SetOn(int id) {
+        var state = stateService.GetState();
+        comService.SetOn(id, state.Rooms.Single(r => r.Id == id).InputId);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/off")]
+    public ActionResult SetOff(int id) {
+        comService.SetOff(id);
+        return Ok();
+    }
 }

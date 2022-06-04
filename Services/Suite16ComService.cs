@@ -14,6 +14,8 @@ public interface ISuite16ComService {
     Response SetStereoEnhance(int id, bool value);
     Response SetPhonic(int id, Phonic value);
     Response SetInput(int id, int value);
+    Response SetOn(int id, int input);
+    Response SetOff(int id);
 }
 
 public class Suite16ComService : ISuite16ComService, IDisposable {
@@ -101,6 +103,16 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
 
     public Response SetInput(int id, int value) {
         Send($"`SAD{value:00}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetOn(int id, int input) {
+        Send($"`SAD{input:00}R{id:00}");
+        return Ok;
+    }
+
+    public Response SetOff(int id) {
+        Send($"`SRMOFR{id:00}");
         return Ok;
     }
 

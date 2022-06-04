@@ -1,3 +1,4 @@
+import { Center } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { BaseUrl, InputDbo, RoomDbo } from "./models";
@@ -19,16 +20,18 @@ export const RoomList = () => {
   }, []);
 
   if (rooms.length === 0) {
-    return <Spinner animation="border" />;
+    return (
+      <Center style={{ height: 500 }}>
+        <Spinner animation="border" />
+      </Center>
+    );
   }
 
   return (
-    <>
-      <Container fluid className="w-75">
-        {rooms.map((r) => (
-          <Room key={r.id} r={r} inputs={inputs} />
-        ))}
-      </Container>
-    </>
+    <Container fluid="sm">
+      {rooms.map((r) => (
+        <Room key={r.id} r={r} inputs={inputs} />
+      ))}
+    </Container>
   );
 };

@@ -1,6 +1,7 @@
 export interface RoomDbo {
   id: string;
   name: string;
+  on: boolean;
   mute: boolean;
   volume: number;
   bass: number;
@@ -23,4 +24,4 @@ export enum Phonic {
   MonoRight,
 }
 
-export const BaseUrl = "http://localhost:5066";
+export const BaseUrl = "http://192.168.1.15:5077";

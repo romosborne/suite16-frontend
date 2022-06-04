@@ -57,13 +57,16 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
     await handle(`stereoEnhance/${value ? "1" : "0"}`, (r) => {
       return { ...r, stereoEnhance: value };
     });
-
   const handleSetInput = async (id: string) => {
     await handle(`input/${id}`, (r) => {
       return { ...r, inputId: id };
     });
   };
-
+  const handleOnOff = async () => {
+    await handle(room.on ? "off" : "on", (r) => {
+      return { ...r, on: !r.on };
+    });
+  };
   const handleSetPhonic = async (phonic: Phonic) => {
     await handle(`phonic/${phonic}`, (r) => {
       return { ...r, phonic: phonic };
@@ -77,7 +80,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
           <Modal.Title>{r.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Row style={{ marginBottom: 20 }}>
+          <Row style={{ marginBottom: 30 }}>
             <Col xs={3}>
               <Text weight={500}>Input: </Text>
             </Col>
@@ -91,7 +94,28 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               />
             </Col>
           </Row>
-          <Row style={{ marginBottom: 20 }}>
+          <hr />
+          <Row style={{ marginBottom: 30 }}>
+            <Col xs={3}>
+              <Text weight={500}>Phonic: </Text>
+            </Col>
+            <Col>
+              <NativeSelect
+                data={[
+                  { value: Phonic[Phonic.Stereo], label: "Stereo" },
+                  { value: Phonic[Phonic.MonoLeft], label: "Mono Left" },
+                  { value: Phonic[Phonic.MonoRight], label: "Mono Right" },
+                ]}
+                value={Phonic[room.phonic]}
+                onChange={(e) =>
+                  handleSetPhonic(
+                    Phonic[e.currentTarget.value as keyof typeof Phonic]
+                  )
+                }
+              />
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: 30 }}>
             <Col xs={3}>
               <Text weight={500}>Treble: </Text>
             </Col>
@@ -113,7 +137,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               />
             </Col>
           </Row>
-          <Row style={{ marginBottom: 20 }}>
+          <Row style={{ marginBottom: 30 }}>
             <Col xs={3}>
               <Text weight={500}>Bass: </Text>
             </Col>
@@ -135,15 +159,17 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               />
             </Col>
           </Row>
-          <Row style={{ marginBottom: 20 }}>
+          <Row style={{ marginBottom: 30 }}>
+            <Col xs={3}>
+              <Text weight={500}>Options: </Text>
+            </Col>
             <Col>
               <Switch
                 label="Loudness Contour"
                 checked={room.loudnessContour}
                 onChange={(e) => handleSetLoud(e.currentTarget.checked)}
+                style={{ marginBottom: 10 }}
               />
-            </Col>
-            <Col>
               <Switch
                 label="Stereo Enhance"
                 checked={room.stereoEnhance}
@@ -153,66 +179,48 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               />
             </Col>
           </Row>
-          <Row style={{ marginBottom: 20 }}>
-            <Col xs={3}>
-              <Text weight={500}>Phonic: </Text>
-            </Col>
-            <Col>
-              <NativeSelect
-                data={[
-                  { value: Phonic[Phonic.Stereo], label: "Stereo" },
-                  { value: Phonic[Phonic.MonoLeft], label: "Mono Left" },
-                  { value: Phonic[Phonic.MonoRight], label: "Mono Right" },
-                ]}
-                value={Phonic[room.phonic]}
-                onChange={(e) =>
-                  handleSetPhonic(
-                    Phonic[e.currentTarget.value as keyof typeof Phonic]
-                  )
-                }
-              />
-            </Col>
-          </Row>
         </Modal.Body>
       </Modal>
 
       <Paper shadow="md" p="md" withBorder style={{ marginTop: 10 }}>
-        <Row style={{ display: "flex", alignItems: "center" }}>
-          <Col xs={1} style={{ padding: "10px", marginRight: "10px" }}>
-            <ActionIcon
-              radius="sm"
-              size="xl"
-              onClick={(_: any) => handleToggleMute()}
-            >
-              {room.mute ? (
-                <Volume3 size={48} />
-              ) : (
-                <Volume size={48} color="orange" />
-              )}
-            </ActionIcon>
-          </Col>
-          <Col>
-            <Title order={2}>{r.name}</Title>
-          </Col>
-          <Col xs={1}>
-            <ActionIcon radius="sm" onClick={(_: any) => setModal(true)}>
-              <Settings size={48} />
-            </ActionIcon>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Slider
-              marks={[{ value: 10 }, { value: 20 }, { value: 30 }]}
-              max={40}
-              label={null}
-              color="orange"
-              value={vol}
-              onChange={setVol}
-              onChangeEnd={handleSetVol}
-            />
-          </Col>
-        </Row>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Title order={2} style={{ flexGrow: 1 }}>
+            {r.name}
+          </Title>
+          <ActionIcon
+            size="lg"
+            radius="md"
+            onClick={(_: any) => setModal(true)}
+            style={{ marginRight: "5px" }}
+          >
+            <Settings size={48} />
+          </ActionIcon>
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <ActionIcon
+            radius="sm"
+            size="xl"
+            onClick={(_: any) => handleToggleMute()}
+            style={{ padding: "5px", marginRight: "5px" }}
+          >
+            {room.mute ? (
+              <Volume3 size={48} />
+            ) : (
+              <Volume size={48} color="orange" />
+            )}
+          </ActionIcon>
+          <Slider
+            marks={[{ value: 10 }, { value: 20 }, { value: 30 }]}
+            max={40}
+            label={null}
+            color="orange"
+            disabled={room.mute}
+            value={vol}
+            onChange={setVol}
+            onChangeEnd={handleSetVol}
+            style={{ flexGrow: 1 }}
+          />
+        </div>
       </Paper>
     </>
   );
