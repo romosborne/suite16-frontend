@@ -1,13 +1,14 @@
 public interface IStateService {
     void ParseCommand(string command);
-    int? IdToIndex(int id);
     State GetState();
 }
 
 public class StateService : IStateService {
     private readonly State _state;
+    private readonly ILogger<StateService> _logger;
 
-    public StateService() {
+    public StateService(ILogger<StateService> logger) {
+        _logger = logger;
         _state = new State();
     }
 
@@ -15,19 +16,12 @@ public class StateService : IStateService {
         return _state;
     }
 
-    public int? IdToIndex(int id) {
-        for (int i = 0; i < _state.Rooms.Length; i++) {
-            if (_state.Rooms[i].Id == id) return i;
-        }
-        return null;
-    }
-
     public void ParseCommand(string command) {
-        System.Console.WriteLine($"Parsing {command}");
+        _logger.LogTrace($"Parsing {command}");
         var f1 = command.Substring(3, 2);
         var f2 = command.Substring(5, 2);
         _ = int.TryParse(command.AsSpan(8, 2), out var room);
-        System.Console.WriteLine($"f1: {f1}, f2:{f2}");
+        _logger.LogTrace($"f1: {f1}, f2:{f2}");
         switch (f1) {
             // Input
             case "AD":

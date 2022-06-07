@@ -1,10 +1,13 @@
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddSimpleConsole(o => {
+    o.IncludeScopes = true;
+    o.SingleLine = true;
+});
 
 // Add services to the container.
+builder.Services.Configure<Suite16ComOptions>(builder.Configuration.GetRequiredSection(Suite16ComOptions.Position));
 builder.Services.AddSingleton<IStateService, StateService>();
-builder.Services.AddSingleton<ISuite16ComService>(i =>
-    new Suite16ComService("COM5",
-        i.GetRequiredService<IStateService>()));
+builder.Services.AddSingleton<ISuite16ComService, Suite16ComService>();
 
 builder.Services.AddControllersWithViews();
 

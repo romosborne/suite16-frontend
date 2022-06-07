@@ -1,4 +1,5 @@
 using System.IO.Ports;
+using Microsoft.Extensions.Options;
 
 public class Response {
     public bool Ok { get; set; }
@@ -18,36 +19,58 @@ public interface ISuite16ComService {
     Response SetOff(int id);
 }
 
+public class Suite16ComOptions {
+    public const string Position = "Suite16Com";
+    public string ComPort { get; set; } = "COM1";
+}
+
 public class Suite16ComService : ISuite16ComService, IDisposable {
     private readonly object _lock;
+    private bool _ready = false;
 
     private readonly List<string> _buffer;
     private readonly SerialPort _sp;
     private readonly IStateService _state;
-
+    private readonly ILogger<Suite16ComService> _logger;
     private readonly Response Ok = new() { Ok = true };
 
-    public Suite16ComService(string comPort, IStateService state) {
+    public Suite16ComService(IOptions<Suite16ComOptions> options, IStateService state, ILogger<Suite16ComService> logger) {
         _state = state;
-
+        _logger = logger;
         _buffer = new List<string>();
         _lock = new object();
 
+        _logger.LogInformation($"Attempting to communicate with the Suite16 on port: {options.Value.ComPort}");
+
         _sp = new SerialPort() {
-            PortName = comPort,
+            PortName = options.Value.ComPort,
             BaudRate = 19200,
             DataBits = 8,
             StopBits = StopBits.One,
             Parity = Parity.None,
+            WriteTimeout = 1000
         };
         _sp.DataReceived += new SerialDataReceivedEventHandler(Read);
         _sp.Open();
-        System.Console.WriteLine("Hello");
+
+        _logger.LogInformation($"Communication open - Attemping state refresh");
+
         CompleteRefresh();
+        _logger.LogInformation($"Connection Established!  Waiting for state...");
+        while (!_ready) {
+            _logger.LogInformation("Waiting...");
+            Thread.Sleep(1000);
+        }
+        _logger.LogInformation("Ready!");
     }
 
     private void Send(string a) {
-        _sp.Write($"{a}\r");
+        try {
+            _sp.Write($"{a}\r");
+        }
+        catch (TimeoutException e) {
+            _logger.LogError($"Timeout talking to the Suite16");
+        }
     }
 
     private Response CompleteRefresh() {
@@ -129,6 +152,9 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
             }
 
             if (command != null) _state.ParseCommand(command);
+
+            // Magic value - final response from the Get Everything call
+            if (command == "`AXPGC8R16\r") _ready = true;
         }
         catch (IOException ex) {
             System.Console.WriteLine(ex);
