@@ -10,7 +10,8 @@ import {
 } from "@mantine/core";
 import { Col, Modal, Row } from "react-bootstrap";
 import { Settings, Volume, Volume3 } from "tabler-icons-react";
-import { BaseUrl, InputDbo, Phonic, RoomDbo } from "./models";
+import { InputDbo, Phonic, RoomDbo } from "./models";
+import { SliderNoClick } from "./SliderNoClick";
 
 export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
   const [showModal, setModal] = useState(false);
@@ -22,7 +23,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
   const [treble, setTreble] = useState(r.treble);
 
   const handle = async (url: string, f: (r: RoomDbo) => RoomDbo) => {
-    const response = await fetch(`${BaseUrl}/room/${r.id}/${url}`, {
+    const response = await fetch(`/room/${r.id}/${url}`, {
       method: "POST",
     });
     if (response.ok) {
@@ -209,7 +210,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
               <Volume size={48} color="orange" />
             )}
           </ActionIcon>
-          <Slider
+          <SliderNoClick
             marks={[{ value: 10 }, { value: 20 }, { value: 30 }]}
             max={40}
             label={null}
