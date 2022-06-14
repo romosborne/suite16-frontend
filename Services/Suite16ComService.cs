@@ -66,6 +66,7 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
 
     private void Send(string a) {
         try {
+            _logger.LogInformation($"Sending: {a}");
             _sp.Write($"{a}\r");
         }
         catch (TimeoutException e) {
@@ -74,7 +75,7 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     }
 
     private Response CompleteRefresh() {
-        Send("`GALRMG00\r\n");
+        Send("`GALRMG00\r");
         return Ok;
     }
 
@@ -150,6 +151,8 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
                     _buffer.Clear();
                 }
             }
+
+            _logger.LogInformation($"Received: {command}");
 
             if (command != null) _state.ParseCommand(command);
 

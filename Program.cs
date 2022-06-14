@@ -1,6 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddSimpleConsole(o => {
-    o.IncludeScopes = true;
     o.SingleLine = true;
 });
 

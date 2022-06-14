@@ -32,72 +32,52 @@ public class RoomController : ControllerBase {
 
     [HttpPost]
     [Route("{id}/toggleMute")]
-    public ActionResult ToggleMute(int id) {
-        comService.ToggleMute(id);
-        return Ok();
-    }
+    public ActionResult ToggleMute(int id) => Wrapping(() => comService.ToggleMute(id))();
 
     [HttpPost]
     [Route("{id}/vol/{value}")]
-    public ActionResult SetVol(int id, int value) {
-        comService.SetVolume(id, value);
-        return Ok();
-    }
+    public ActionResult SetVol(int id, int value) => Wrapping(() => comService.SetVolume(id, value))();
 
     [HttpPost]
     [Route("{id}/treble/{value}")]
-    public ActionResult SetTreble(int id, int value) {
-        comService.SetTreble(id, value);
-        return Ok();
-    }
+    public ActionResult SetTreble(int id, int value) => Wrapping(() => comService.SetTreble(id, value))();
 
     [HttpPost]
     [Route("{id}/bass/{value}")]
-    public ActionResult SetBass(int id, int value) {
-        comService.SetBass(id, value);
-        return Ok();
-    }
+    public ActionResult SetBass(int id, int value) => Wrapping(() => comService.SetBass(id, value))();
 
     [HttpPost]
     [Route("{id}/loudnessContour/{value}")]
-    public ActionResult SetLoudnessContour(int id, int value) {
-        comService.SetLoudnessContour(id, value == 1);
-        return Ok();
-    }
+    public ActionResult SetLoudnessContour(int id, int value) => Wrapping(() => comService.SetLoudnessContour(id, value == 1))();
 
     [HttpPost]
     [Route("{id}/stereoEnhance/{value}")]
-    public ActionResult SetStereoEnhance(int id, int value) {
-        comService.SetStereoEnhance(id, value == 1);
-        return Ok();
-    }
+    public ActionResult SetStereoEnhance(int id, int value) => Wrapping(() => comService.SetStereoEnhance(id, value == 1))();
 
     [HttpPost]
     [Route("{id}/phonic/{value}")]
-    public ActionResult SetPhonic(int id, Phonic value) {
-        comService.SetPhonic(id, value);
-        return Ok();
-    }
+    public ActionResult SetPhonic(int id, Phonic value) => Wrapping(() => comService.SetPhonic(id, value))();
 
     [HttpPost]
     [Route("{id}/input/{value}")]
-    public ActionResult SetInput(int id, int value) {
-        comService.SetInput(id, value);
-        return Ok();
-    }
+    public ActionResult SetInput(int id, int value) => Wrapping(() => comService.SetInput(id, value))();
 
     [HttpPost]
     [Route("{id}/on")]
-    public ActionResult SetOn(int id) {
+    public ActionResult SetOn(int id) => Wrapping(() => {
         var state = stateService.GetState();
-        comService.SetOn(id, state.Rooms.Single(r => r.Id == id).InputId);
-        return Ok();
-    }
+        return comService.SetOn(id, state.Rooms.Single(r => r.Id == id).InputId);
+    })();
 
     [HttpPost]
     [Route("{id}/off")]
-    public ActionResult SetOff(int id) {
-        comService.SetOff(id);
-        return Ok();
+    public ActionResult SetOff(int id) => Wrapping(() => comService.SetOff(id))();
+
+    private Func<ActionResult> Wrapping(Func<Response> f) {
+        return () => {
+            var response = f();
+            if (response.Ok) return Ok();
+            else return UnprocessableEntity(response.Error);
+        };
     }
 }
