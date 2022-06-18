@@ -1,0 +1,11 @@
+[Unit]
+Description=Control the Dovecote Speakers
+
+[Service]
+WorkingDirectory=/home/pi/suite16
+ExecStart=/home/pi/.dotnet/dotnet /home/pi/suite16/suite-16-api.dll
+SyslogIdentifier=DovecoteSpeakers
+User=pi
+
+[Install]
+WantedBy=multi-user.target
