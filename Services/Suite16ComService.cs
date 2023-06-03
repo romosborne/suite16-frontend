@@ -28,6 +28,8 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     private readonly object _lock;
     private bool _ready = false;
 
+    private readonly Thread _bg;
+
     private readonly List<string> _buffer;
     private readonly SerialPort _sp;
     private readonly IStateService _state;
@@ -48,13 +50,16 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
             DataBits = 8,
             StopBits = StopBits.One,
             Parity = Parity.None,
-            WriteTimeout = 1000
+            WriteTimeout = 1000,
+            NewLine = "\r"
         };
-        _sp.DataReceived += new SerialDataReceivedEventHandler(Read);
         _sp.Open();
 
         _logger.LogInformation($"Communication open - Attemping state refresh");
 
+        _bg = new Thread(ReadInBackground);
+        _bg.IsBackground = true;
+        _bg.Start();
         CompleteRefresh();
         _logger.LogInformation($"Connection Established!  Waiting for state...");
         while (!_ready) {
@@ -71,6 +76,14 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
         }
         catch (TimeoutException e) {
             _logger.LogError($"Timeout talking to the Suite16");
+        }
+    }
+
+    private void ReadInBackground() {
+        while(true) {
+            var command = _sp.ReadLine();
+            Console.WriteLine($"Got: {command}");
+            _state.ParseCommand(command);
         }
     }
 
@@ -138,30 +151,6 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     public Response SetOff(int id) {
         Send($"`SRMOFR{id:00}");
         return Ok;
-    }
-
-    private void Read(object sender, SerialDataReceivedEventArgs e) {
-        try {
-            string? command = null;
-            lock (_lock) {
-                var x = _sp.ReadExisting();
-                _buffer.Add(x);
-                if (x.EndsWith("\r")) {
-                    command = string.Join("", _buffer);
-                    _buffer.Clear();
-                }
-            }
-
-            _logger.LogInformation($"Received: {command}");
-
-            if (command != null) _state.ParseCommand(command);
-
-            // Magic value - final response from the Get Everything call
-            if (command == "`AXPGC8R16\r") _ready = true;
-        }
-        catch (IOException ex) {
-            System.Console.WriteLine(ex);
-        }
     }
 
     public void Dispose() {
