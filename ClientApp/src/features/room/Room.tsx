@@ -65,7 +65,7 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
       });
     } else {
       await handle(`input/${id}`, (r) => {
-        return { ...r, inputId: id, on: true };
+        return { ...r, inputId: id, on: true, mute: false };
       });
     }
   };
