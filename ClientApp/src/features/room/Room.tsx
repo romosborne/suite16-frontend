@@ -59,9 +59,15 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
       return { ...r, stereoEnhance: value };
     });
   const handleSetInput = async (id: string) => {
-    await handle(`input/${id}`, (r) => {
-      return { ...r, inputId: id };
-    });
+    if (id === "") {
+      await handle("off", (r) => {
+        return { ...r, on: false };
+      });
+    } else {
+      await handle(`input/${id}`, (r) => {
+        return { ...r, inputId: id, on: true };
+      });
+    }
   };
   const handleOnOff = async () => {
     await handle(room.on ? "off" : "on", (r) => {
@@ -188,6 +194,15 @@ export const Room = ({ r, inputs }: { r: RoomDbo; inputs: InputDbo[] }) => {
           <Title order={2} style={{ flexGrow: 1 }}>
             {r.name}
           </Title>
+          <NativeSelect
+            data={inputs
+              .map((i) => {
+                return { value: i.id, label: i.name };
+              })
+              .concat([{ value: "", label: "Off" }])}
+            value={room.on ? room.inputId : ""}
+            onChange={(e) => handleSetInput(e.currentTarget.value)}
+          />
           <ActionIcon
             size="lg"
             radius="md"

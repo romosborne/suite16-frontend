@@ -23,9 +23,16 @@ public class StateService : IStateService {
         _ = int.TryParse(command.AsSpan(8, 2), out var room);
         _logger.LogTrace($"f1: {f1}, f2:{f2}");
         switch (f1) {
+            // Room off
+            case "RM":
+                _state.AdjustRoom(room, (r) => r.On = false);
+                break;
             // Input
             case "AD":
-                _state.AdjustRoom(room, (r) => r.InputId = int.Parse(f2));
+                _state.AdjustRoom(room, (r) => {
+                    r.InputId = int.Parse(f2);
+                    r.On = true;
+                    });
                 break;
             // Mute
             case "MT":
@@ -86,6 +93,9 @@ public class StateService : IStateService {
                         _state.AdjustRoom(room, (r) => r.Phonic = Phonic.MonoRight);
                         break;
                 }
+                break;
+            default: 
+                _logger.LogWarning($"Ignoring command: {command}");
                 break;
         }
     }
