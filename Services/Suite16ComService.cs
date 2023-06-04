@@ -80,12 +80,14 @@ public class Suite16ComService : ISuite16ComService, IDisposable {
     }
 
     private void ReadInBackground() {
-        while(true) {
+        while(_sp.IsOpen) {
             var command = _sp.ReadLine();
             Console.WriteLine($"Got: {command}");
             _state.ParseCommand(command);
             if(command == "`AXPGC8R16") _ready = true;
         }
+
+        _logger.LogWarning("Serial port closed");
     }
 
     private Response CompleteRefresh() {
