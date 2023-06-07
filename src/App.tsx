@@ -5,7 +5,7 @@ import { Modal } from "react-bootstrap";
 import { TextInput } from "@mantine/core";
 
 function App() {
-  const [server, setServer] = useState<string | null>("192.168.5.113:5000");
+  const [server, setServer] = useState<string | null>("api.speakers.lan");
 
   return (
     <>
