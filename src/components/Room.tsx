@@ -204,7 +204,7 @@ export const Room = ({
             onClick={(_: any) => handleToggleMute()}
             style={{ padding: "5px", marginRight: "5px" }}
           >
-            {r.mute ? (
+            {r.mute || !r.on ? (
               <Volume3 size={48} />
             ) : (
               <Volume size={48} color="orange" />
