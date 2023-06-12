@@ -1,6 +1,5 @@
 import * as signalR from "@microsoft/signalr";
 import { RoomDbo } from "./components/models";
-const URL = "http://localhost:5103/roomHub"; //or whatever your backend port is
 class Connector {
   private connection: signalR.HubConnection;
   public events: (
@@ -8,9 +7,10 @@ class Connector {
     onRoomUpdate: (room: RoomDbo) => void
   ) => void;
   static instance: Connector;
-  constructor() {
+
+  constructor(url: string) {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(URL)
+      .withUrl(`http://${url}/roomHub`)
       .withAutomaticReconnect()
       .build();
     this.connection.start().catch((err) => document.write(err));
@@ -19,8 +19,8 @@ class Connector {
       this.connection.on("UpdateRoom", (room) => onRoomUpdate(room));
     };
   }
-  public static getInstance(): Connector {
-    if (!Connector.instance) Connector.instance = new Connector();
+  public static getInstance(url: string): Connector {
+    if (!Connector.instance) Connector.instance = new Connector(url);
     return Connector.instance;
   }
 }

@@ -9,7 +9,7 @@ export const RoomList = (props: { server: string }) => {
   const [rooms, setRooms] = useState<RoomDbo[]>([]);
   const [inputs, setInputs] = useState<InputDbo[]>([]);
 
-  const { newMessage, events } = Connector();
+  const { events } = Connector(props.server);
 
   useEffect(() => {
     events(
