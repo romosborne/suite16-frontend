@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActionIcon,
   NativeSelect,
@@ -23,65 +23,46 @@ export const Room = ({
   server: string;
 }) => {
   const [showModal, setModal] = useState(false);
-  const [room, setRoom] = useState(r);
 
-  // State for sliders
   const [vol, setVol] = useState(r.volume);
   const [bass, setBass] = useState(r.bass);
   const [treble, setTreble] = useState(r.treble);
 
-  const handle = async (url: string, f: (r: RoomDbo) => RoomDbo) => {
+  useEffect(() => {
+    setVol(r.volume);
+    setBass(r.bass);
+    setTreble(r.treble);
+  }, [r]);
+
+  const handle = async (url: string) => {
     const response = await fetch(`http://${server}/room/${r.id}/${url}`, {
       method: "POST",
     });
-    if (response.ok) {
-      setRoom(f);
-    } else {
+    if (!response.ok) {
       const body = await response.text();
       console.error(`Status: ${response.statusText} Body: ${body}`);
     }
   };
 
-  const handleToggleMute = async () =>
-    await handle("toggleMute", (r) => {
-      return { ...r, mute: !r.mute };
-    });
-  const handleSetVol = async (value: number) =>
-    await handle(`vol/${value}`, (r) => {
-      return { ...r, vol: value };
-    });
-  const handleSetBass = async (value: number) =>
-    await handle(`bass/${value}`, (r) => {
-      return { ...r, bass: value };
-    });
+  const handleToggleMute = async () => await handle("toggleMute");
+  const handleSetVol = async (value: number) => await handle(`vol/${value}`);
+  const handleSetBass = async (value: number) => await handle(`bass/${value}`);
   const handleSetTreble = async (value: number) =>
-    await handle(`treble/${value}`, (r) => {
-      return { ...r, treble: value };
-    });
+    await handle(`treble/${value}`);
   const handleSetLoud = async (value: boolean) =>
-    await handle(`loudnessContour/${value ? "1" : "0"}`, (r) => {
-      return { ...r, loudnessContour: value };
-    });
+    await handle(`loudnessContour/${value ? "1" : "0"}`);
   const handleSetStereoEnhance = async (value: boolean) =>
-    await handle(`stereoEnhance/${value ? "1" : "0"}`, (r) => {
-      return { ...r, stereoEnhance: value };
-    });
+    await handle(`stereoEnhance/${value ? "1" : "0"}`);
   const handleSetInput = async (id: string) => {
     if (id === "") {
-      await handle("off", (r) => {
-        return { ...r, on: false };
-      });
+      await handle("off");
     } else {
-      await handle(`input/${id}`, (r) => {
-        return { ...r, inputId: id, on: true, mute: false };
-      });
+      await handle(`input/${id}`);
     }
   };
 
   const handleSetPhonic = async (phonic: Phonic) => {
-    await handle(`phonic/${phonic}`, (r) => {
-      return { ...r, phonic: phonic };
-    });
+    await handle(`phonic/${phonic}`);
   };
 
   return (
@@ -100,7 +81,7 @@ export const Room = ({
                 data={inputs.map((i) => {
                   return { value: i.id, label: i.name };
                 })}
-                value={room.inputId}
+                value={r.inputId}
                 onChange={(e) => handleSetInput(e.currentTarget.value)}
               />
             </Col>
@@ -117,7 +98,7 @@ export const Room = ({
                   { value: Phonic[Phonic.MonoLeft], label: "Mono Left" },
                   { value: Phonic[Phonic.MonoRight], label: "Mono Right" },
                 ]}
-                value={Phonic[room.phonic]}
+                value={Phonic[r.phonic]}
                 onChange={(e) =>
                   handleSetPhonic(
                     Phonic[e.currentTarget.value as keyof typeof Phonic]
@@ -177,13 +158,13 @@ export const Room = ({
             <Col>
               <Switch
                 label="Loudness Contour"
-                checked={room.loudnessContour}
+                checked={r.loudnessContour}
                 onChange={(e) => handleSetLoud(e.currentTarget.checked)}
                 style={{ marginBottom: 10 }}
               />
               <Switch
                 label="Stereo Enhance"
-                checked={room.stereoEnhance}
+                checked={r.stereoEnhance}
                 onChange={(e) =>
                   handleSetStereoEnhance(e.currentTarget.checked)
                 }
@@ -204,7 +185,7 @@ export const Room = ({
                 return { value: i.id, label: i.name };
               })
               .concat([{ value: "", label: "Off" }])}
-            value={room.on ? room.inputId : ""}
+            value={r.on ? r.inputId : ""}
             onChange={(e) => handleSetInput(e.currentTarget.value)}
           />
           <ActionIcon
@@ -223,7 +204,7 @@ export const Room = ({
             onClick={(_: any) => handleToggleMute()}
             style={{ padding: "5px", marginRight: "5px" }}
           >
-            {room.mute ? (
+            {r.mute ? (
               <Volume3 size={48} />
             ) : (
               <Volume size={48} color="orange" />
@@ -234,7 +215,7 @@ export const Room = ({
             max={40}
             label={null}
             color="orange"
-            disabled={room.mute}
+            disabled={r.mute}
             value={vol}
             onChange={setVol}
             onChangeEnd={handleSetVol}

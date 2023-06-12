@@ -3,10 +3,30 @@ import { useEffect, useState } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { InputDbo, RoomDbo } from "./models";
 import { Room } from "./Room";
+import Connector from "../signalRConnection";
 
 export const RoomList = (props: { server: string }) => {
   const [rooms, setRooms] = useState<RoomDbo[]>([]);
   const [inputs, setInputs] = useState<InputDbo[]>([]);
+
+  const { newMessage, events } = Connector();
+
+  useEffect(() => {
+    events(
+      (m) => console.warn(`Ping: ${m}`),
+      (r) => {
+        //console.warn({ r });
+        setRooms((rooms) => {
+          const newRooms = [];
+          for (const oldRoom of rooms) {
+            if (oldRoom.id === r.id) newRooms.push(r);
+            else newRooms.push(oldRoom);
+          }
+          return newRooms;
+        });
+      }
+    );
+  });
 
   useEffect(() => {
     const fetchState = async () => {
