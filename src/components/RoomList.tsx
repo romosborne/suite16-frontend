@@ -1,13 +1,16 @@
 import { Center } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Container, Spinner } from "react-bootstrap";
-import { InputDbo, RoomDbo } from "./models";
+import { AnthemDbo, InputDbo, RoomDbo } from "./models";
 import { Room } from "./Room";
 import Connector from "../signalRConnection";
+import { Anthem } from "./Anthem";
 
 export const RoomList = (props: { server: string }) => {
   const [rooms, setRooms] = useState<RoomDbo[]>([]);
   const [inputs, setInputs] = useState<InputDbo[]>([]);
+  const [anthem, setAnthem] = useState<AnthemDbo | null>(null);
+  const [anthemInputs, setAnthemInputs] = useState<InputDbo[]>([]);
 
   const { events } = Connector(props.server);
 
@@ -24,6 +27,9 @@ export const RoomList = (props: { server: string }) => {
           }
           return newRooms;
         });
+      },
+      (a) => {
+        setAnthem(a);
       }
     );
   });
@@ -34,6 +40,8 @@ export const RoomList = (props: { server: string }) => {
       const json = await data.json();
       setRooms(json.rooms);
       setInputs(json.inputs);
+      setAnthem(json.anthem);
+      setAnthemInputs(json.anthemInputs);
     };
 
     fetchState().catch(console.error);
@@ -49,6 +57,9 @@ export const RoomList = (props: { server: string }) => {
 
   return (
     <Container fluid="sm">
+      {anthem && (
+        <Anthem a={anthem} inputs={anthemInputs} server={props.server} />
+      )}
       {rooms.map((r) => (
         <Room key={r.id} r={r} inputs={inputs} server={props.server} />
       ))}

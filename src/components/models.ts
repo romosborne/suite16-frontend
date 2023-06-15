@@ -18,6 +18,11 @@ export interface InputDbo {
   name: string;
 }
 
+export interface AnthemDbo {
+  volume: number;
+  inputId: string;
+}
+
 export enum Phonic {
   Stereo,
   MonoLeft,
