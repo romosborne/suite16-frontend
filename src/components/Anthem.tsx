@@ -38,8 +38,6 @@ export const Anthem = ({
           <Title order={2} style={{ flexGrow: 1, textAlign: "left" }}>
             Anthem
           </Title>
-        </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
           <NativeSelect
             data={inputs.map((i) => {
               return { value: i.id, label: i.name };
@@ -47,9 +45,14 @@ export const Anthem = ({
             value={a.inputId}
             onChange={(e) => handleSetInput(e.currentTarget.value)}
           />
+        </div>
+        <div
+          style={{ display: "flex", alignItems: "center", minHeight: "44px" }}
+        >
           <SliderNoClick
-            marks={[{ value: 10 }, { value: 20 }, { value: 30 }]}
-            max={40}
+            marks={[{ value: -75 }, { value: -50 }, { value: -25 }]}
+            min={-95.5}
+            max={0}
             label={null}
             color={"orange"}
             value={vol}
