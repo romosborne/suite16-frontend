@@ -54,11 +54,9 @@ export const Anthem = ({
             min={-95.5}
             max={0}
             label={null}
-            color={"orange"}
             value={vol}
             onChange={setVol}
             onChangeEnd={handleSetVol}
-            style={{ flexGrow: 1 }}
           />
         </div>
       </Paper>

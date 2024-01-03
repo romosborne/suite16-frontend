@@ -1,5 +1,17 @@
 [
-  { "id": "1","name": "Lounge", "muted": false, "volume": 35 },
-  { "id": "2","name": "Kitchen", "muted": false, "volume": 24 },
-  { "id": "3","name": "Patio", "muted": true, "volume": 24 }
+  {
+    "id": "1",
+    "name": "Lounge",
+    "muted": false,
+    "volume": 35,
+    "on": true,
+    "bass": 0,
+    "treble": 0,
+    "mute": false,
+    "balance": 0,
+    "stereoEnhance": false,
+    "loudnessContour": false,
+    "inputId": "1",
+    "phonic": 0
+  }
 ]

@@ -17,6 +17,10 @@ export const SliderNoClick = (props: SliderProps) => {
         root: classes.root,
         thumb: classes.thumb,
       }}
+      color="orange"
+      style={{ flexGrow: 1 }}
+      size="xl"
+      thumbSize={32}
       {...props}
     />
   );

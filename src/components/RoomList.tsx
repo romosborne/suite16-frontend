@@ -6,13 +6,22 @@ import { Room } from "./Room";
 import Connector from "../signalRConnection";
 import { Anthem } from "./Anthem";
 
+import testrooms from "./rooms.json";
+import testinputs from "./inputs.json";
+
 export const RoomList = (props: { server: string }) => {
-  const [rooms, setRooms] = useState<RoomDbo[]>([]);
-  const [inputs, setInputs] = useState<InputDbo[]>([]);
+  const [rooms, setRooms] = useState<RoomDbo[]>(
+    import.meta.env.PROD ? [] : testrooms
+  );
+  const [inputs, setInputs] = useState<InputDbo[]>(
+    import.meta.env.PROD ? [] : testinputs
+  );
   const [anthem, setAnthem] = useState<AnthemDbo | null>(null);
   const [anthemInputs, setAnthemInputs] = useState<InputDbo[]>([]);
 
-  const { events } = Connector(props.server);
+  const { events } = props.server
+    ? Connector(props.server)
+    : { events: (_1, _2, _3) => {} };
 
   useEffect(() => {
     events(
@@ -45,7 +54,7 @@ export const RoomList = (props: { server: string }) => {
     };
 
     fetchState().catch(console.error);
-  }, []);
+  }, [props.server]);
 
   if (rooms.length === 0) {
     return (

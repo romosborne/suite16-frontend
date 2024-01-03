@@ -191,7 +191,7 @@ export const Room = ({
           <ActionIcon
             size="lg"
             radius="md"
-            onClick={(_: any) => setModal(true)}
+            onClick={() => setModal(true)}
             style={{ marginRight: "5px" }}
           >
             <Settings size={48} />
@@ -201,7 +201,7 @@ export const Room = ({
           <ActionIcon
             radius="sm"
             size="xl"
-            onClick={(_: any) => handleToggleMute()}
+            onClick={() => handleToggleMute()}
             style={{ padding: "5px", marginRight: "5px" }}
           >
             {r.mute || !r.on ? (
@@ -219,7 +219,6 @@ export const Room = ({
             value={vol}
             onChange={setVol}
             onChangeEnd={handleSetVol}
-            style={{ flexGrow: 1 }}
           />
         </div>
       </Paper>
