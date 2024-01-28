@@ -21,7 +21,7 @@ export const RoomList = (props: { server: string }) => {
 
   const { events } = props.server
     ? Connector(props.server)
-    : { events: (_1, _2, _3) => {} };
+    : { events: (_1: any, _2: any, _3: any) => {} };
 
   useEffect(() => {
     events(
